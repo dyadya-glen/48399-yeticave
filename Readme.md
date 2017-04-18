@@ -1,7 +1,7 @@
 # Личный проект «YetiCave» 
 
 * Студент: [Роман Гуляев](https://up.htmlacademy.ru/php/1/user/48399).
-* Наставник: `Неизвестно`.
+* Наставник: [Александр Борисов](https://htmlacademy.ru/profile/dmnbars).
 
 ---
 
