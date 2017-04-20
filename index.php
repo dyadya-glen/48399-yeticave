@@ -12,7 +12,16 @@ $tomorrow = strtotime('tomorrow midnight');
 $now = time();
 
 // далее нужно вычислить оставшееся время до начала следующих суток и записать его в переменную $lot_time_remaining
-// ...
+$remaining_time_seconds = $tomorrow - $now;
+$remaining_time_hours = floor($remaining_time_seconds / 3600);
+if ($remaining_time_hours < 10) {
+    $remaining_time_hours = "0" . $remaining_time_hours;
+}
+$remaining_time_minutes = floor(($remaining_time_seconds % 3600) / 60);
+if ($remaining_time_minutes < 10) {
+    $remaining_time_minutes = "0" . $remaining_time_minutes;
+}
+$lot_time_remaining = $remaining_time_hours . ":" . $remaining_time_minutes;
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -23,7 +32,6 @@ $now = time();
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-
 <header class="main-header">
     <div class="main-header__container container">
         <h1 class="visually-hidden">YetiCave</h1>
