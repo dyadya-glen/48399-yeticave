@@ -1,15 +1,16 @@
 <?php
 date_default_timezone_set('Europe/Moscow');
 
-function formatTime ($markerTime) {
+function formatTime ($markerTime)
+{
     $elapsed_time = (time() - $markerTime) / 3600;
 
     if ($elapsed_time >= 24) {
-        $result = date("d.m.y" . " в " . "H:i", $markerTime);
+        $result = date("d.m.y в H:i", $markerTime);
     } elseif ($elapsed_time < 24 && $elapsed_time >= 1) {
-        $result = date( "H" . " часов назад", $markerTime);
+        $result = date("G часов назад", $markerTime);
     } else {
-        $result = date( "i" . " минут назад", $markerTime);
+        $result = ltrim(date("i минут назад", $markerTime), "0");
     }
 
     return $result;
