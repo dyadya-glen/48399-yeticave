@@ -1,7 +1,7 @@
 <?php
 date_default_timezone_set('Europe/Moscow');
 
-function formatTime ($markerTime)
+function formatTime($markerTime)
 {
     $elapsed_time = (time() - $markerTime) / 3600;
 
