@@ -68,8 +68,8 @@
                     <table class="history__list">
                         <?php foreach ($bets as $cell) : ?>
                             <tr class="history__item">
-                                <td class="history__name"><?= $cell["name"]; ?>"</td>
-                                <td class="history__price"><?= $cell["price"]; ?></td>
+                                <td class="history__name"><?= strip_tags($cell["name"]); ?>"</td>
+                                <td class="history__price"><?= strip_tags($cell["price"]); ?></td>
                                 <td class="history__time"><?= formatTime($cell["ts"]); ?></td>
                             </tr>
                         <?php endforeach; ?>
