@@ -25,6 +25,17 @@ $bets = [
 
 require 'functions.php';
 
+include 'bulletin_board.php';
+
+$lot_id = intval($_GET['id']);
+
+if (!array_key_exists($lot_id, $bulletin_board)) {
+    header('HTTP/1.1 404 Not Found');
+    exit();
+}
+
+$lot = $bulletin_board[$lot_id];
+
 ?>
 
 <!DOCTYPE html>
@@ -37,11 +48,11 @@ require 'functions.php';
 </head>
 <body>
 
-<?= connectionTemplates('header.php', []); ?>
+<?= includeTemplate('header.php', []); ?>
 
-<?= connectionTemplates('lot_content.php', ['bets' => $bets]); ?>
+<?= includeTemplate('lot_content.php', ['bets' => $bets, 'lot' => $lot]); ?>
 
-<?= connectionTemplates('footer.php', []); ?>
+<?= includeTemplate('footer.php', []); ?>
 
 </body>
 </html>
