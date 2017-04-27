@@ -1,6 +1,6 @@
 <?php
 
-function connectionTemplates($template, $array_data)
+function includeTemplate($template, $array_data)
 {
     $template = 'templates/' . $template;
 
