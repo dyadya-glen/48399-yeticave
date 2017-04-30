@@ -5,6 +5,7 @@ require 'functions.php';
 include 'data.php';
 
 $errors = [];
+$photoLot = [];
 
 if (!empty($_POST)) {
     foreach ($_POST as $key => $value) {
