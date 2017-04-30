@@ -31,15 +31,14 @@ if (!empty($_POST)) {
     }
 
     if (empty($errors)) {
-        array_unshift(
-            $bulletin_board,
-            [
-                "name" => $_POST["lot-name"],
-                "category" => $_POST["category"],
-                "price" => $_POST["lot-rate"],
-                "url_image" => 'img/' . $photoLot['name'],
-            ]
-        );
+        $lot = [
+            "name" => $_POST["lot-name"],
+            "category" => $_POST["category"],
+            "price" => $_POST["lot-rate"],
+            "url_image" => 'img/' . $photoLot['name'],
+            "description" => $_POST['message'],
+        ];
+
     }
 }
 
@@ -63,7 +62,7 @@ if (!empty($_POST)) {
 
 <?php else : ?>
 
-    <?= includeTemplate('main.php', ['categories' => $categories, 'bulletin_board' => $bulletin_board]); ?>
+    <?= includeTemplate('lot_content.php', ['bets' => $bets, 'lot' => $lot]); ?>
 
 <?php endif; ?>
 
