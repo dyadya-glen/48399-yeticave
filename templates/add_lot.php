@@ -35,7 +35,7 @@
                 <select id="category" name="category">
                     <option value="">Выберите категорию</option>
                     <?php foreach ($categories as $key => $category) : ?>
-                        <option <?= $category == $_POST['category'] ? 'selected' : ''; ?> ><?= $category; ?></option>
+                        <option <?= isset($_POST['category']) && $category == $_POST['category'] ? 'selected' : ''; ?> ><?= $category; ?></option>
                     <?php endforeach; ?>
                 </select>
                 <span class="form__error"><?= !empty($errors['category']) ? $errors['category'] : '' ?></span>
