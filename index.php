@@ -1,10 +1,8 @@
 <?php
-// массивы
-$categories = ["Доски и лыжи", "Крепления", "Ботинки", "Одежда", "Инструменты", "Разное"];
 
 require 'functions.php';
 
-include 'bulletin_board.php';
+include 'data.php';
 
 ?>
 
