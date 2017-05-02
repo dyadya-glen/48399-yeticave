@@ -22,7 +22,7 @@
         </ul>
     </nav>
 
-    <form class="form form--add-lot container<?= !empty($errors) ? ' form--invalid' : '' ?>" action="add.php" method="post" enctype="multipart/form-data"> <!-- form--invalid -->
+    <form class="form form--add-lot container<?= !empty($errors) ? ' form--invalid' : '' ?>" action="add.php" method="post" enctype="multipart/form-data">
         <h2>Добавление лота</h2>
         <div class="form__container-two">
             <div class="form__item<?= !empty($errors['lot-name']) ? ' form__item--invalid' : '' ?>"> <!-- form__item--invalid -->
@@ -48,7 +48,7 @@
             <span class="form__error"><?= !empty($errors['message']) ? $errors['message'] : '' ?></span>
         </div>
 
-        <div class="form__item form__item--file<?= empty($errors['uploadfile']) && !empty($photoLot['tmp_name']) ? ' form__item--uploaded' : '' ?>"> <!-- form__item--uploaded -->
+        <div class="form__item form__item--file<?= empty($errors['uploadfile']) && !empty($photoLot['tmp_name']) ? ' form__item--uploaded' : '' ?>">
             <label>Изображение</label>
             <div class="preview">
                 <button class="preview__remove" type="button">x</button>
