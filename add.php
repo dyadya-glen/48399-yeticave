@@ -6,7 +6,7 @@ require 'functions.php';
 
 include 'data.php';
 
-if (!$_SESSION['user']) {
+if (empty($_SESSION['user'])) {
     header('HTTP/1.1 403 Forbidden');
     exit();
 }
