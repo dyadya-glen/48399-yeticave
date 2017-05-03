@@ -1,6 +1,6 @@
 <?php
 
-function includeTemplate($template, $array_data)
+function includeTemplate($template, $array_data = [])
 {
     $template = 'templates/' . $template;
 
@@ -50,15 +50,70 @@ function formatTime($markerTime)
 {
     date_default_timezone_set('Europe/Moscow');
 
-    $elapsed_time = (time() - $markerTime) / 3600;
+    $diff_time = time() - $markerTime;
+    $elapsed_time = $diff_time / 3600;
 
     if ($elapsed_time >= 24) {
         $result = date("d.m.y в H:i", $markerTime);
     } elseif ($elapsed_time < 24 && $elapsed_time >= 1) {
-        $result = date("G часов назад", $markerTime);
+        $result = date("G часов назад", $diff_time);
     } else {
-        $result = ltrim(date("i минут назад", $markerTime), "0");
+        $result = ltrim(date("i минут назад", $diff_time), "0");
     }
 
     return $result;
+}
+
+function checkEmptyPost($post)
+{
+    $errors = [];
+
+    foreach ($post as $key => $value) {
+        $post[$key] = strip_tags($value);
+
+        if (empty($value)) {
+            $errors[$key] = 'Заполните это поле';
+            continue;
+        }
+    }
+
+    return $errors;
+}
+
+function searchUserByEmail($email, $users)
+{
+    $result = null;
+
+    foreach ($users as $user) {
+        if ($user['email'] == $email) {
+            $result = $user;
+
+            break;
+        }
+    }
+
+    return $result;
+}
+
+
+function isLotHasBet($lot_id, $my_bets)
+{
+    foreach ($my_bets as $bet) {
+        if ($bet['lot_id'] == $lot_id) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function decodesСookie()
+{
+    $my_bets = [];
+
+    if (isset($_COOKIE["my_bets"])) {
+        $my_bets = json_decode($_COOKIE["my_bets"], true);
+    }
+
+    return $my_bets;
 }

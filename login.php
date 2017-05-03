@@ -9,34 +9,22 @@ include 'userdata.php';
 $errors = [];
 
 if (!empty($_POST)) {
-    foreach ($_POST as $key => $value) {
-        $_POST[$key] = strip_tags($value);
+    $errors = checkEmptyPost($_POST);
 
-        if (empty($value)) {
-            $errors[$key] = 'Заполните это поле';
-            continue;
-        }
-    }
 
     if (empty($errors)) {
-        $user_found = false;
+        $user = searchUserByEmail($_POST['email'], $users);
 
-        foreach ($users as $user) {
-            if ($_POST['email'] == $user['email']) {
-                $user_found = true;
+        if ($user) {
+            if (password_verify($_POST['password'], $user['password'])) {
+                $_SESSION['user'] = $user;
 
-                if (password_verify($_POST['password'], $user['password'])) {
-                    $_SESSION['user'] = $user;
-
-                    header("Location: /");
-                    exit();
-                } else {
-                    $errors['password'] = "Не верный пароль!";
-                }
-                break;
+                header("Location: /");
+                exit();
+            } else {
+                $errors['password'] = "Не верный пароль!";
             }
-        }
-        if (!$user_found) {
+        } else {
             $errors['email'] = "Пользователь не найден!";
         }
     }
@@ -54,11 +42,11 @@ if (!empty($_POST)) {
 </head>
 <body>
 
-<?= includeTemplate('header.php', []); ?>
+<?= includeTemplate('header.php'); ?>
 
 <?= includeTemplate('login.php', ['errors' => $errors]); ?>
 
-<?= includeTemplate('footer.php', []); ?>
+<?= includeTemplate('footer.php'); ?>
 
 </body>
 </html>

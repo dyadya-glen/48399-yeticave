@@ -62,7 +62,7 @@ if (!empty($_POST)) {
 </head>
 <body>
 
-<?= includeTemplate('header.php', []); ?>
+<?= includeTemplate('header.php'); ?>
 
 <?php if (empty($_POST) || !empty($errors)) : ?>
 
@@ -74,7 +74,7 @@ if (!empty($_POST)) {
 
 <?php endif; ?>
 
-<?= includeTemplate('footer.php', []); ?>
+<?= includeTemplate('footer.php'); ?>
 
 </body>
 </html>
