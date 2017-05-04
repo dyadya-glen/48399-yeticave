@@ -6,6 +6,8 @@ require 'functions.php';
 
 include 'data.php';
 
+$my_bets = getBetsList();
+
 ?>
 
 <!DOCTYPE html>
@@ -20,7 +22,7 @@ include 'data.php';
 
 <?= includeTemplate('header.php'); ?>
 
-<?= includeTemplate('main.php', ['categories' => $categories, 'bulletin_board' => $bulletin_board]); ?>
+<?= includeTemplate('mylots.php', ['bulletin_board' => $bulletin_board, 'my_bets' => $my_bets]); ?>
 
 <?= includeTemplate('footer.php'); ?>
 
