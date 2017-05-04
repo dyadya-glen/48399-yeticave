@@ -13,9 +13,7 @@ if (!array_key_exists($lot_id, $bulletin_board)) {
     exit();
 }
 
-$lot = $bulletin_board[$lot_id];
-
-$my_bets = decodesСookie();
+$my_bets = getBetsList();
 
 if (!empty($_POST['cost']) && filter_var($_POST['cost'], FILTER_VALIDATE_INT)) {
     $my_bets[] = [
@@ -30,7 +28,6 @@ if (!empty($_POST['cost']) && filter_var($_POST['cost'], FILTER_VALIDATE_INT)) {
     exit();
 }
 
-$is_lot_has_bet = isLotHasBet($lot_id, $my_bets);
 ?>
 
 <!DOCTYPE html>
@@ -45,7 +42,11 @@ $is_lot_has_bet = isLotHasBet($lot_id, $my_bets);
 
 <?= includeTemplate('header.php'); ?>
 
-<?= includeTemplate('lot_content.php', ['bets' => $bets, 'lot' => $lot, 'is_lot_has_bet' => $is_lot_has_bet]); ?>
+<?= includeTemplate('lot_content.php', [
+    'bets' => $bets,
+    'lot' => $bulletin_board[$lot_id],
+    'is_lot_has_bet' => isLotHasBet($lot_id, $my_bets)
+]); ?>
 
 <?= includeTemplate('footer.php'); ?>
 

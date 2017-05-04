@@ -107,7 +107,7 @@ function isLotHasBet($lot_id, $my_bets)
     return false;
 }
 
-function decodesСookie()
+function getBetsList()
 {
     $my_bets = [];
 

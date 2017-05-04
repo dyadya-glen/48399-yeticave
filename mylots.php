@@ -6,7 +6,7 @@ require 'functions.php';
 
 include 'data.php';
 
-$my_bets = decodesСookie();
+$my_bets = getBetsList();
 
 ?>
 
