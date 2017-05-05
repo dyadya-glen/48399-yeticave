@@ -7,7 +7,7 @@ id INT AUTO_INCREMENT PRIMARY KEY,
 name CHAR(128)
 );
 
-CREATE TABLE lot (
+CREATE TABLE lots (
 id INT AUTO_INCREMENT PRIMARY KEY,
 created_date DATETIME,
 completion_date DATETIME,
@@ -17,15 +17,15 @@ image CHAR(255),
 initial_price INT,
 step_bet INT,
 additions_favorites INT,
-author_id INT,
+user_id INT,
 winner_id INT,
 category_id INT
 );
 
-CREATE TABLE bet (
+CREATE TABLE bets (
 id INT AUTO_INCREMENT PRIMARY KEY,
-date_bet DATETIME,
-amount_bet INT,
+created_date DATETIME,
+amount INT,
 user_id INT,
 lot_id INT
 );
@@ -34,20 +34,12 @@ CREATE TABLE users (
 id INT AUTO_INCREMENT PRIMARY KEY,
 registration_date DATETIME,
 email CHAR(255),
-user_name CHAR(255),
+name CHAR(255),
 password CHAR(64),
 avatar_path CHAR(255),
-contacts TEXT,
-user_lots_id INT,
-user_bets_id INT
+contacts TEXT
 );
 
-CREATE INDEX name ON categories(name);
-
-CREATE UNIQUE INDEX name ON lot(name);
-
-CREATE UNIQUE INDEX amount ON bet(amount_bet);
+CREATE INDEX name ON lots(name);
 
 CREATE UNIQUE INDEX email ON users(email);
-
-CREATE UNIQUE INDEX name ON users(user_name);
