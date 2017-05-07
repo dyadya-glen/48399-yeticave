@@ -34,8 +34,8 @@ VALUE ("Super-Board 2017",
        "img/lot-7.jpg",
        "10789",
        "200",
-       "2017-06-05",
-       "2017-06-07");
+       NOW(),
+       "2017-06-07 13:15:00");
 
 # 5.обновить название лота по его идентификатору;
 UPDATE lots SET `name` = 'Arbor Draft (16-17)' WHERE `id` = '7';
@@ -45,7 +45,7 @@ INSERT INTO `bets` (`created_date`,
                     `amount`,
                     `user_id`,
                     `lot_id`)
-VALUE ("2017-05-07 12:05:00",
+VALUE (NOW(),
        "10989",
        "3",
        "7");
