@@ -27,7 +27,8 @@ INSERT INTO lots (`name`,
                   `initial_price`,
                   `step_bet`,
                   `created_date`,
-                  `completion_date`)
+                  `completion_date`,
+                  `user_id`)
 VALUE ("Super-Board 2017",
        "1",
        "Эта доска доставит вас к подножью горы в мгновение ока!!!",
@@ -35,7 +36,8 @@ VALUE ("Super-Board 2017",
        "10789",
        "200",
        NOW(),
-       "2017-06-07 13:15:00");
+       "2017-06-07 13:15:00",
+       "1");
 
 # 5.обновить название лота по его идентификатору;
 UPDATE lots SET `name` = 'Arbor Draft (16-17)' WHERE `id` = '7';
