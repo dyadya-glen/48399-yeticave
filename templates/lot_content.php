@@ -22,11 +22,11 @@
         </ul>
     </nav>
     <section class="lot-item container">
-        <h2><?= strip_tags($lot['name']) ?></h2>
+        <h2><?= strip_tags($lot['lot_name']) ?></h2>
         <div class="lot-item__content">
             <div class="lot-item__left">
                 <div class="lot-item__image">
-                    <img src="<?= strip_tags($lot['url_image'])?>" width="730" height="548" alt="Сноуборд">
+                    <img src="<?= strip_tags($lot['image'])?>" width="730" height="548" alt="Сноуборд">
                 </div>
                 <p class="lot-item__category">Категория: <span><?= strip_tags($lot['category'])?></span></p>
                 <p class="lot-item__description"><?= strip_tags($lot['description']) ?></p>

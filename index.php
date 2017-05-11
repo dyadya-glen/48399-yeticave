@@ -12,7 +12,7 @@ if (!$link) {
     $sql = "SELECT * FROM categories";
     $categories = receivingData($link, $sql);
 
-    $sql = 'SELECT lots.name AS lot_name, categories.name AS category, description, image, initial_price FROM lots'
+    $sql = 'SELECT lots.id, lots.name AS lot_name, categories.name AS category, description, image, initial_price FROM lots'
         .' JOIN categories ON lots.category_id = categories.id'
         .' ORDER BY created_date DESC LIMIT 6';
     $bulletin_board = receivingData($link, $sql);
@@ -48,7 +48,7 @@ if (!$link) {
 
 <?= includeTemplate('main.php', ['categories' => $categories, 'bulletin_board' => $bulletin_board]); ?>
 
-<?= includeTemplate('footer.php'); ?>
+<?= includeTemplate('footer.php', ['categories' => $categories]); ?>
 
 </body>
 </html>
