@@ -8,7 +8,7 @@ SELECT lots.`name`, `initial_price`, `image`, `categories`.`name` AS 'category',
 FROM lots
 JOIN `categories`
 ON lots.`category_id` = `categories`.id
-JOIN bets
+LEFT JOIN bets
 ON lots.id = bets.`lot_id`
 WHERE `completion_date` > NOW()
 GROUP BY lots.id
@@ -52,5 +52,8 @@ VALUE (NOW(),
        "3",
        "7");
 
-# 6.получить список ставок для лота по его идентификатору.
+# 7.получить список ставок для лота по его идентификатору.
 SELECT * FROM bets WHERE `lot_id` = 6;
+
+# 8. Добавление столбща в таблицу
+ALTER TABLE categories ADD COLUMN css_class CHAR(64) AFTER name;
