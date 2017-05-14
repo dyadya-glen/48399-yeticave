@@ -1,24 +1,11 @@
 <main>
     <nav class="nav">
         <ul class="nav__list container">
-            <li class="nav__item">
-                <a href="all-lots.html">Доски и лыжи</a>
-            </li>
-            <li class="nav__item">
-                <a href="all-lots.html">Крепления</a>
-            </li>
-            <li class="nav__item">
-                <a href="all-lots.html">Ботинки</a>
-            </li>
-            <li class="nav__item">
-                <a href="all-lots.html">Одежда</a>
-            </li>
-            <li class="nav__item">
-                <a href="all-lots.html">Инструменты</a>
-            </li>
-            <li class="nav__item">
-                <a href="all-lots.html">Разное</a>
-            </li>
+            <?php foreach ($categories as $category) : ?>
+                <li class="nav__item">
+                    <a href=""><?= $category['name']; ?></a>
+                </li>
+            <?php endforeach; ?>
         </ul>
     </nav>
 
@@ -34,8 +21,8 @@
                 <label for="category">Категория</label>
                 <select id="category" name="category">
                     <option value="">Выберите категорию</option>
-                    <?php foreach ($categories as $key => $category) : ?>
-                        <option <?= isset($_POST['category']) && $category == $_POST['category'] ? 'selected' : ''; ?> ><?= $category; ?></option>
+                    <?php foreach ($categories as $category) : ?>
+                        <option <?= isset($_POST['category']) && $category['name'] == $_POST['category'] ? 'selected' : ''; ?> ><?= $category['name']; ?></option>
                     <?php endforeach; ?>
                 </select>
                 <span class="form__error"><?= !empty($errors['category']) ? $errors['category'] : '' ?></span>
@@ -74,10 +61,10 @@
                 <input id="lot-step" type="number" name="lot-step" value="<?= isset($_POST['lot-step']) ? $_POST['lot-step'] : '' ?>" placeholder="0">
                 <span class="form__error"><?= !empty($errors['lot-step']) ? $errors['lot-step'] : '' ?></span>
             </div>
-            <div class="form__item<?= !empty($errors['lot-date']) ? ' form__item--invalid' : '' ?>">
-                <label for="lot-date">Дата завершения</label>
-                <input class="form__input-date" id="lot-date" type="text" name="lot-date" value="<?= isset($_POST['lot-date']) ? $_POST['lot-date'] : '' ?>" placeholder="20.05.2017">
-                <span class="form__error"><?= !empty($errors['lot-date']) ? $errors['lot-date'] : '' ?></span>
+            <div class="form__item<?= !empty($errors['completion_date']) ? ' form__item--invalid' : '' ?>">
+                <label for="completion_date">Дата завершения</label>
+                <input class="form__input-date" id="completion_date" type="text" name="completion_date" value="<?= isset($_POST['completion_date']) ? $_POST['completion_date'] : '' ?>" placeholder="20.05.2017">
+                <span class="form__error"><?= !empty($errors['completion_date']) ? $errors['completion_date'] : '' ?></span>
             </div>
         </div>
         <span class="form__error form__error--bottom">Пожалуйста, исправьте ошибки в форме.</span>

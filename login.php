@@ -4,13 +4,22 @@ session_start();
 
 require 'functions.php';
 
-include 'userdata.php';
+$link = getDbConnection();
+
+if (!$link) {
+    print('Ошибка подключения: ' . mysqli_connect_error());
+} else {
+    $sql = "SELECT * FROM categories";
+    $categories = receivingData($link, $sql);
+
+    $sql = "SELECT * FROM users";
+    $users = receivingData($link, $sql);
+}
 
 $errors = [];
 
 if (!empty($_POST)) {
     $errors = checkEmptyPost($_POST);
-
 
     if (empty($errors)) {
         $user = searchUserByEmail($_POST['email'], $users);
@@ -44,9 +53,9 @@ if (!empty($_POST)) {
 
 <?= includeTemplate('header.php'); ?>
 
-<?= includeTemplate('login.php', ['errors' => $errors]); ?>
+<?= includeTemplate('login.php', ['categories' => $categories, 'errors' => $errors]); ?>
 
-<?= includeTemplate('footer.php'); ?>
+<?= includeTemplate('footer.php', ['categories' => $categories]); ?>
 
 </body>
 </html>

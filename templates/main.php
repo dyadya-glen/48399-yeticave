@@ -35,7 +35,7 @@
                                 <span class="lot__cost"><?= strip_tags($bulletin["initial_price"]); ?><b class="rub">р</b></span>
                             </div>
                             <div class="lot__timer timer">
-<!--                                --><?//= lot_time_remaining(); ?>
+                                <?= lot_time_remaining(strtotime($bulletin['completion_date'])); ?>
                             </div>
                         </div>
                     </div>

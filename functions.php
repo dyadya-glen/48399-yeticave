@@ -21,17 +21,22 @@ function includeTemplate($template, $array_data = [])
     return $html_template;
 }
 
-function lot_time_remaining()
+function lot_time_remaining($tomorrow)
 {
     date_default_timezone_set('Europe/Moscow');
 
-    $tomorrow = strtotime('tomorrow midnight');
+//    $tomorrow = strtotime('tomorrow midnight');
 
     $now = time();
 
     $remaining_time_seconds = $tomorrow - $now;
 
     $remaining_time_hours = floor($remaining_time_seconds / 3600);
+
+    if ($remaining_time_hours >= 24) {
+        $remaining_time_dey = floor($remaining_time_hours / 24);
+        $remaining_time_hours = $remaining_time_hours % 24;
+    }
 
     if ($remaining_time_hours < 10) {
         $remaining_time_hours = "0" . $remaining_time_hours;
@@ -43,7 +48,7 @@ function lot_time_remaining()
         $remaining_time_minutes = "0" . $remaining_time_minutes;
     }
 
-    $lot_time_remaining = $remaining_time_hours . ":" . $remaining_time_minutes;
+    $lot_time_remaining = $remaining_time_dey .".". $remaining_time_hours . ":" . $remaining_time_minutes;
 
     return $lot_time_remaining;
 }
