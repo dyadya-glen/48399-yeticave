@@ -14,9 +14,17 @@ if (!$link) {
     $sql = "SELECT * FROM categories";
     $categories = receivingData($link, $sql);
 
-    $sql = "SELECT lots.id, completion_date, lots.name AS lot_name, categories.name AS category,"
-        ." description, image, initial_price, step_bet AS step FROM lots"
-        ." JOIN categories ON lots.category_id = categories.id WHERE lots.id = ?";
+    $sql = "SELECT lots.id,
+                   completion_date,
+                   lots.name AS lot_name,
+                   categories.name AS category,
+                   description,
+                   image,
+                   initial_price,
+                   step_bet AS step
+            FROM lots
+            JOIN categories ON lots.category_id = categories.id
+            WHERE lots.id = ?";
 
     $get_id[] =  $lot_id;
 
@@ -27,12 +35,13 @@ if (!$link) {
         ." ORDER BY created_date DESC";
     $bets = receivingData($link, $sql, $get_id);
 
-    $lot = $bulletin_board[0];
 
-    if (!($lot_id == $lot['id'])) {
+    if (!isset($bulletin_board[0])) {
         header('HTTP/1.1 404 Not Found');
         exit();
     }
+
+    $lot = $bulletin_board[0];
 
     if ($bets) {
         $price =  $bets[0]['amount'];

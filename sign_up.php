@@ -12,12 +12,8 @@ if (!$link) {
     $sql = "SELECT * FROM categories";
     $categories = receivingData($link, $sql);
 
-    $sql = "SELECT email FROM users";
-    $users = receivingData($link, $sql);
-
     $errors = [];
     $user_avatar = [];
-
 
     if (!empty($_POST)) {
         foreach ($_POST as $key => $value) {
@@ -28,54 +24,54 @@ if (!$link) {
                 continue;
             }
 
-            if (in_array($key, ['email']) && !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+            if (in_array($key, ['email']) && !filter_var($_POST[$key], FILTER_VALIDATE_EMAIL)) {
                 $errors[$key] = 'Не корректный ввод email!';
             }
 
-            if (searchUserByEmail($_POST['email'], $users)) {
-                $errors['email'] = "Такой пользователь уже зарегистрирован!";
+            if (in_array($key, ['email']) && searchUserByEmail($link, $_POST[$key])) {
+                $errors[$key] = "Такой пользователь уже зарегистрирован!";
             }
         }
-        //$errors = checkEmptyPost($_POST);
 
         if (isset($_FILES['user_avatar'])) {
             $user_avatar = $_FILES['user_avatar'];
-            if ($user_avatar) {
-                if ($user_avatar['type'] == 'image/jpeg') {
-                    move_uploaded_file($user_avatar['tmp_name'], '/img/' . $user_avatar['name']);
-                } else {
-                    $errors['user_avatar'] = 'Неверный формат!';
-                }
+            if ($user_avatar['type'] == 'image/jpeg') {
+                move_uploaded_file(
+                    $user_avatar['tmp_name'],
+                    $_SERVER['DOCUMENT_ROOT'] . '/img/' . $user_avatar['name']
+                );
             } else {
-                $user_avatar = ['name' => 'avatar.jpg'];
+                $errors['user_avatar'] = 'Неверный формат!';
             }
-
         }
 
         if (empty($errors)) {
-            $users_email = $_POST['email'];
-            $user_name = $_POST['name'];
-            $users_password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $avatar_path = '/img/' . $user_avatar['name'];
-            $user_contacts = $_POST['message'];
+            $user = [
+                    'email' => $_POST['email'],
+                    'name' => $_POST['name'],
+                    'password'=> password_hash($_POST['password'], PASSWORD_DEFAULT),
+                    'avatar_path' => '/img/' . $user_avatar['name'],
+                    'contacts' => $_POST['message']
+            ];
 
-            $data = [$users_email, $user_name, $users_password, $avatar_path, $user_contacts];
+            $data = [$user['email'], $user['name'], $user['password'], $user['avatar_path'], $user['contacts']];
 
             $sql = "INSERT INTO users (`registration_date`, `email`, `name`, `password`, `avatar_path`, `contacts`)"
                 ."VALUE (NOW(), ?, ?, ?, ?, ?)";
 
-            $user = insertData($link, $sql, $data);
+            $user_id = insertData($link, $sql, $data);
+
+            $user['id'] =  $user_id;
 
             $_SESSION['user'] = $user;
 
             header("Location: /");
-            exit();
 
+            exit();
         }
     }
 }
 
-//print_r($_POST['email']);
 ?>
 
 <!DOCTYPE html>
@@ -90,7 +86,11 @@ if (!$link) {
 
 <?= includeTemplate('header.php'); ?>
 
-<?= includeTemplate('sign_up.php', ['categories' => $categories, 'errors' => $errors, 'user_avatar' => $user_avatar]); ?>
+<?= includeTemplate('sign_up.php', [
+    'categories' => $categories,
+    'errors' => $errors,
+    'user_avatar' => $user_avatar,
+]); ?>
 
 <?= includeTemplate('footer.php', ['categories' => $categories]); ?>
 

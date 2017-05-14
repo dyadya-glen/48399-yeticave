@@ -11,9 +11,6 @@ if (!$link) {
 } else {
     $sql = "SELECT * FROM categories";
     $categories = receivingData($link, $sql);
-
-    $sql = "SELECT * FROM users";
-    $users = receivingData($link, $sql);
 }
 
 $errors = [];
@@ -22,7 +19,7 @@ if (!empty($_POST)) {
     $errors = checkEmptyPost($_POST);
 
     if (empty($errors)) {
-        $user = searchUserByEmail($_POST['email'], $users);
+        $user = searchUserByEmail($link, $_POST['email']);
 
         if ($user) {
             if (password_verify($_POST['password'], $user['password'])) {

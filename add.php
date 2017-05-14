@@ -11,8 +11,6 @@ if (empty($_SESSION['user'])) {
     exit();
 }
 
-//print_r($categories);
-
 if (!$link) {
     print('Ошибка подключения: ' . mysqli_connect_error());
 } else {
@@ -47,49 +45,24 @@ if (!$link) {
         }
 
         if (empty($errors)) {
-            list($lot_name, $category_post, $description, $initial_price, $step_bet, $completion_date) = array_values($_POST);
+            list($lot_name, $category_id, $description, $initial_price, $step_bet, $completion_date) = array_values($_POST);
             $completion_date = date("Y-m-d H:i:s", strtotime($completion_date));
             $user_id = $_SESSION['user']['id'];
             $image = '/img/' . $_FILES['uploadfile']['name'];
-            $category_id = '';
-            foreach ($categories as $category) {
-                if ($category['name'] == $category_post) {
-                    $category_id = $category['id'];
-                    break;
-                }
-            }
+
             $data = [$completion_date, $lot_name, $description, $image, $initial_price, $step_bet, $user_id, $category_id];
 
             $sql = "INSERT INTO lots (created_date, completion_date, name, description, image, initial_price, step_bet, user_id, category_id)"
                 ."VALUE (NOW(), ?, ?, ?, ?, ?, ?, ?, ?)";
 
-            $get_id[] = insertData($link, $sql, $data);
+            $lot_id = insertData($link, $sql, $data);
 
-
-            $sql = "SELECT created_date, amount, bets.user_id, bets.lot_id, users.name AS name FROM bets"
-                ." JOIN users ON bets.user_id = users.id WHERE bets.lot_id = ?"
-                ." ORDER BY created_date DESC";
-            $bets = receivingData($link, $sql, $get_id);
-
-            if ($bets) {
-                $price =  $bets[0]['amount'];
-            } else {
-                $price = $initial_price;
+            if ($lot_id > 0) {
+                header("Location: /lot.php?id=" . $lot_id);
+                exit();
             }
-
-            $lot = [
-                "lot_name" => $lot_name,
-                "category" => $category_post,
-                "completion_date" => $completion_date,
-                "price" => $price,
-                "image" => $image,
-                "description" => $description,
-                "step" => $step_bet
-            ];
         }
-
     }
-
 }
 
 ?>
@@ -106,15 +79,7 @@ if (!$link) {
 
 <?= includeTemplate('header.php'); ?>
 
-<?php if (empty($_POST) || !empty($errors)) : ?>
-
-    <?= includeTemplate('add_lot.php', ['errors' => $errors, 'photoLot' => $photoLot, 'categories' => $categories]); ?>
-
-<?php else : ?>
-
-    <?= includeTemplate('lot_content.php', ['bets' => $bets, 'lot' => $lot, 'price' => $initial_price, 'categories' => $categories]); ?>
-
-<?php endif; ?>
+<?= includeTemplate('add_lot.php', ['errors' => $errors, 'photoLot' => $photoLot, 'categories' => $categories]); ?>
 
 <?= includeTemplate('footer.php', ['categories' => $categories]); ?>
 

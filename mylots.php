@@ -4,6 +4,11 @@ session_start();
 
 require 'functions.php';
 
+if (empty($_SESSION['user'])) {
+    header('HTTP/1.1 403 Forbidden');
+    exit();
+}
+
 $link = getDbConnection();
 
 $my_bets = getBetsList();
@@ -14,10 +19,19 @@ if (!$link) {
     $sql = "SELECT * FROM categories";
     $categories = receivingData($link, $sql);
 
-    $sql = "SELECT lots.id, completion_date, lots.name AS lot_name, categories.name AS category, description, image, initial_price, step_bet AS step FROM lots"
-        . " JOIN categories ON lots.category_id = categories.id";
+    $sql = "SELECT bets.created_date,
+                   amount,
+                   lot_id,
+                   lots.image AS lot_image,
+                   lots.name AS lot_name,
+                   lots.completion_date AS lot_completion_date,
+                   categories.name AS category
+            FROM bets
+            JOIN lots ON lots.id = bets.lot_id
+            JOIN categories ON categories.id = lots.category_id
+            WHERE bets.user_id = ?";
 
-    $bulletin_board = receivingData($link, $sql);
+    $my_bets = receivingData($link, $sql, [$_SESSION['user']['id']]);
 }
 
 ?>
@@ -34,7 +48,7 @@ if (!$link) {
 
 <?= includeTemplate('header.php'); ?>
 
-<?= includeTemplate('mylots.php', ['bulletin_board' => $bulletin_board, 'my_bets' => $my_bets]); ?>
+<?= includeTemplate('mylots.php', ['my_bets' => $my_bets, 'categories' => $categories]); ?>
 
 <?= includeTemplate('footer.php', ['categories' => $categories]); ?>
 
