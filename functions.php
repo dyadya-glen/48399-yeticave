@@ -31,8 +31,9 @@ function lot_time_remaining($tomorrow)
 
     $remaining_time_hours = floor($remaining_time_seconds / 3600);
 
+    $remaining_time_day = floor($remaining_time_hours / 24);
+
     if ($remaining_time_hours >= 24) {
-        $remaining_time_dey = floor($remaining_time_hours / 24);
         $remaining_time_hours = $remaining_time_hours % 24;
     }
 
@@ -46,7 +47,7 @@ function lot_time_remaining($tomorrow)
         $remaining_time_minutes = "0" . $remaining_time_minutes;
     }
 
-    $lot_time_remaining = $remaining_time_dey .".". $remaining_time_hours . ":" . $remaining_time_minutes;
+    $lot_time_remaining = $remaining_time_day .".". $remaining_time_hours . ":" . $remaining_time_minutes;
 
     return $lot_time_remaining;
 }

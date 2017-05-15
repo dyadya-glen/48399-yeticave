@@ -7,7 +7,10 @@ require 'functions.php';
 $link = getDbConnection();
 
 if (!$link) {
+    header('HTTP/1.1 500 Internal Server Error');
     print('Ошибка подключения: ' . mysqli_connect_error());
+    die();
+
 } else {
     $sql = "SELECT * FROM categories";
     $categories = receivingData($link, $sql);
@@ -33,7 +36,7 @@ if (!$link) {
             }
         }
 
-        if (isset($_FILES['user_avatar'])) {
+        if (isset($_FILES['user_avatar']) && $_FILES['user_avatar']['error'] == UPLOAD_ERR_OK) {
             $user_avatar = $_FILES['user_avatar'];
             if ($user_avatar['type'] == 'image/jpeg') {
                 move_uploaded_file(
@@ -43,6 +46,8 @@ if (!$link) {
             } else {
                 $errors['user_avatar'] = 'Неверный формат!';
             }
+        } else {
+            $user_avatar['name'] = 'i.jpg';
         }
 
         if (empty($errors)) {
@@ -61,13 +66,16 @@ if (!$link) {
 
             $user_id = insertData($link, $sql, $data);
 
-            $user['id'] =  $user_id;
+            if (!empty($user_id)) {
+                $user['id'] =  $user_id;
 
-            $_SESSION['user'] = $user;
+                $_SESSION['user'] = $user;
 
-            header("Location: /");
+                header("Location: /");
 
-            exit();
+                exit();
+            }
+
         }
     }
 }
@@ -86,11 +94,7 @@ if (!$link) {
 
 <?= includeTemplate('header.php'); ?>
 
-<?= includeTemplate('sign_up.php', [
-    'categories' => $categories,
-    'errors' => $errors,
-    'user_avatar' => $user_avatar,
-]); ?>
+<?= includeTemplate('sign_up.php', ['categories' => $categories, 'errors' => $errors]); ?>
 
 <?= includeTemplate('footer.php', ['categories' => $categories]); ?>
 

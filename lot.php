@@ -9,7 +9,10 @@ $link = getDbConnection();
 $lot_id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
 if (!$link) {
+    header('HTTP/1.1 500 Internal Server Error');
     print('Ошибка подключения: ' . mysqli_connect_error());
+    die();
+
 } else {
     $sql = "SELECT * FROM categories";
     $categories = receivingData($link, $sql);
@@ -26,14 +29,12 @@ if (!$link) {
             JOIN categories ON lots.category_id = categories.id
             WHERE lots.id = ?";
 
-    $get_id[] =  $lot_id;
-
-    $bulletin_board = receivingData($link, $sql, $get_id);
+    $bulletin_board = receivingData($link, $sql, [$lot_id]);
 
     $sql = "SELECT created_date, amount, bets.user_id, bets.lot_id, users.name AS name FROM bets"
         ." JOIN users ON bets.user_id = users.id WHERE bets.lot_id = ?"
         ." ORDER BY created_date DESC";
-    $bets = receivingData($link, $sql, $get_id);
+    $bets = receivingData($link, $sql, [$lot_id]);
 
 
     if (!isset($bulletin_board[0])) {
@@ -49,17 +50,26 @@ if (!$link) {
         $price = $lot['initial_price'];
     }
 
-    $my_bets = getBetsList();
+    if (!empty($_SESSION['user'])) {
+        $user_id = $_SESSION['user']['id'];
+
+        $sql = "SELECT amount AS cost, lot_id, created_date AS time FROM bets WHERE bets.user_id = ?";
+        $my_bets = receivingData($link, $sql, [$user_id]);
+    } else {
+        $my_bets = [];
+    }
+
 
     if (!empty($_POST['cost']) && filter_var($_POST['cost'], FILTER_VALIDATE_INT)) {
-        $my_bets[] = [
+        $bet = [
             'cost' => $_POST['cost'],
+            'user_id' => $user_id,
             'lot_id' => $lot_id,
-            'time' => time(),
         ];
 
-        $my_bets = json_encode($my_bets);
-        setcookie("my_bets", $my_bets, strtotime("+1 days"));
+        $sql = "INSERT INTO bets (`created_date`, `amount`, `user_id`, `lot_id`) VALUE (NOW(), ?, ?, ?)";
+        insertData($link, $sql, $bet);
+
         header("Location: /mylots.php");
         exit();
     }
@@ -78,13 +88,16 @@ if (!$link) {
 
 <?= includeTemplate('header.php'); ?>
 
-<?= includeTemplate('lot_content.php', [
-                                                'categories' => $categories,
-                                                'bets' => $bets,
-                                                'lot' => $lot,
-                                                'price' => $price,
-                                                'is_lot_has_bet' => isLotHasBet($lot_id, $my_bets)
-                                                ]); ?>
+<?= includeTemplate(
+    'lot_content.php',
+    [
+        'categories' => $categories,
+        'bets' => $bets,
+        'lot' => $lot,
+        'price' => $price,
+        'is_lot_has_bet' => isLotHasBet($lot_id, $my_bets)
+    ]
+); ?>
 
 <?= includeTemplate('footer.php', ['categories' => $categories]); ?>
 

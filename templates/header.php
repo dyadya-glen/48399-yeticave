@@ -23,7 +23,7 @@
         <?php else : ?>
             <nav class="user-menu">
                 <div class="user-menu__image">
-                    <img src="<?= $_SESSION['user']['avatar_path'] ?>" width="40" height="40" alt="Пользователь">
+                    <a href="/mylots.php"><img src="<?= $_SESSION['user']['avatar_path'] ?>" width="40" height="40" alt="Пользователь"></a>
                 </div>
                 <div class="user-menu__logged">
                     <p><?= $_SESSION['user']['name'] ?></p>

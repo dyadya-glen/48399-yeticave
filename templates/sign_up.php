@@ -8,9 +8,9 @@
             <?php endforeach; ?>
         </ul>
     </nav>
-    <form class="form container <?= !empty($errors) ? ' form--invalid' : '' ?>" action="sign_up.php" method="post" enctype="multipart/form-data"> <!-- form--invalid -->
+    <form class="form container <?= !empty($errors) ? ' form--invalid' : '' ?>" action="sign_up.php" method="post" enctype="multipart/form-data">
         <h2>Регистрация нового аккаунта</h2>
-        <div class="form__item<?= !empty($errors['email']) ? ' form__item--invalid' : '' ?>"> <!-- form__item--invalid -->
+        <div class="form__item<?= !empty($errors['email']) ? ' form__item--invalid' : '' ?>">
             <label for="email">E-mail*</label>
             <input id="email" type="text" name="email" value="<?= isset($_POST['email']) ? $_POST['email'] : '' ?>" placeholder="Введите e-mail">
             <span class="form__error"><?= isset($errors['email']) ? $errors['email'] : '' ?></span>
@@ -39,7 +39,7 @@
                 </div>
             </div>
             <div class="form__input-file">
-                <input class="visually-hidden" type="file" id="photo2" name="user_avatar" value="<?= isset($_FILES['user_avatar']) ? $_FILES['user_avatar'] : '' ?>">
+                <input class="visually-hidden" type="file" id="photo2" name="user_avatar">
                 <label for="photo2">
                     <span>+ Добавить</span>
                 </label>

@@ -5,8 +5,10 @@ session_start();
 require 'functions.php';
 
 if (empty($_SESSION['user'])) {
-    header('HTTP/1.1 403 Forbidden');
-    exit();
+    header('HTTP/1.1 500 Internal Server Error');
+    print('Ошибка подключения: ' . mysqli_connect_error());
+    die();
+
 }
 
 $link = getDbConnection();

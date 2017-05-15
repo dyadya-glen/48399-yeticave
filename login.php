@@ -7,7 +7,10 @@ require 'functions.php';
 $link = getDbConnection();
 
 if (!$link) {
+    header('HTTP/1.1 500 Internal Server Error');
     print('Ошибка подключения: ' . mysqli_connect_error());
+    die();
+
 } else {
     $sql = "SELECT * FROM categories";
     $categories = receivingData($link, $sql);
