@@ -1,6 +1,6 @@
 <main>
 
-<?php require_once 'menu_categories.php' ?>
+    <?php require_once 'menu_categories.php' ?>
 
     <section class="rates container">
         <h2>Мои ставки</h2>

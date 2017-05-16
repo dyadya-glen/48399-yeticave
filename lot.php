@@ -31,16 +31,16 @@ if (!$link) {
 
     $bulletin_board = receivingData($link, $sql, [$lot_id]);
 
+    if (!isset($bulletin_board[0])) {
+        header('HTTP/1.1 404 Not Found');
+        exit();
+    }
+
     $sql = "SELECT created_date, amount, bets.user_id, bets.lot_id, users.name AS name FROM bets"
         ." JOIN users ON bets.user_id = users.id WHERE bets.lot_id = ?"
         ." ORDER BY created_date DESC";
     $bets = receivingData($link, $sql, [$lot_id]);
 
-
-    if (!isset($bulletin_board[0])) {
-        header('HTTP/1.1 404 Not Found');
-        exit();
-    }
 
     $lot = $bulletin_board[0];
 
@@ -55,24 +55,24 @@ if (!$link) {
 
         $sql = "SELECT amount AS cost, lot_id, created_date AS time FROM bets WHERE bets.user_id = ?";
         $my_bets = receivingData($link, $sql, [$user_id]);
+
+        if (!empty($_POST['cost']) && filter_var($_POST['cost'], FILTER_VALIDATE_INT)) {
+            $bet = [
+                'cost' => $_POST['cost'],
+                'user_id' => $user_id,
+                'lot_id' => $lot_id,
+            ];
+
+            $sql = "INSERT INTO bets (`created_date`, `amount`, `user_id`, `lot_id`) VALUE (NOW(), ?, ?, ?)";
+            insertData($link, $sql, $bet);
+
+            header("Location: /mylots.php");
+            exit();
+        }
     } else {
         $my_bets = [];
     }
 
-
-    if (!empty($_POST['cost']) && filter_var($_POST['cost'], FILTER_VALIDATE_INT)) {
-        $bet = [
-            'cost' => $_POST['cost'],
-            'user_id' => $user_id,
-            'lot_id' => $lot_id,
-        ];
-
-        $sql = "INSERT INTO bets (`created_date`, `amount`, `user_id`, `lot_id`) VALUE (NOW(), ?, ?, ?)";
-        insertData($link, $sql, $bet);
-
-        header("Location: /mylots.php");
-        exit();
-    }
 }
 ?>
 

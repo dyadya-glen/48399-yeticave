@@ -1,5 +1,5 @@
 <main>
-<?php require_once 'menu_categories.php' ?>
+    <?php require_once 'menu_categories.php' ?>
     <section class="lot-item container">
         <h2><?= strip_tags($lot['lot_name']) ?></h2>
         <div class="lot-item__content">

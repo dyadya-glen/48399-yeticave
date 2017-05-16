@@ -1,6 +1,6 @@
 <main>
 
-<?php require_once 'menu_categories.php' ?>
+    <?php require_once 'menu_categories.php' ?>
 
     <form class="form form--add-lot container<?= !empty($errors) ? ' form--invalid' : '' ?>" action="add.php" method="post" enctype="multipart/form-data">
         <h2>Добавление лота</h2>

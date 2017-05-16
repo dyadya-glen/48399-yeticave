@@ -1,13 +1,7 @@
 <main>
-    <nav class="nav">
-        <ul class="nav__list container">
-            <?php foreach ($categories as $category) : ?>
-                <li class="nav__item">
-                    <a href="#"><?= $category['name']; ?></a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    </nav>
+
+    <?php require_once 'menu_categories.php' ?>
+
     <form class="form container <?= !empty($errors) ? ' form--invalid' : '' ?>" action="sign_up.php" method="post" enctype="multipart/form-data">
         <h2>Регистрация нового аккаунта</h2>
         <div class="form__item<?= !empty($errors['email']) ? ' form__item--invalid' : '' ?>">

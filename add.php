@@ -49,28 +49,27 @@ if (!$link) {
 
         if (empty($errors)) {
                 [
-                'lot-name' => $lot_name,
-                'category' => $category_id,
-                'message' => $description,
-                'lot-rate' => $initial_price,
-                'lot-step' => $step_bet,
-                'completion_date' => $completion_date
+                    'lot-name' => $lot_name,
+                    'category' => $category_id,
+                    'message' => $description,
+                    'lot-rate' => $initial_price,
+                    'lot-step' => $step_bet,
+                    'completion_date' => $completion_date
                 ] = $_POST;
             $completion_date = date("Y-m-d H:i:s", strtotime($completion_date));
             $user_id = $_SESSION['user']['id'];
             $image = '/img/' . $_FILES['uploadfile']['name'];
 
-            $data =
-                [
-                    $completion_date,
-                    $lot_name,
-                    $description,
-                    $image,
-                    $initial_price,
-                    $step_bet,
-                    $user_id,
-                    $category_id
-                ];
+            $data = [
+                $completion_date,
+                $lot_name,
+                $description,
+                $image,
+                $initial_price,
+                $step_bet,
+                $user_id,
+                $category_id
+            ];
 
             $sql = "INSERT INTO lots (created_date, completion_date, name, "
                 ."description, image, initial_price, step_bet, user_id, category_id)"
