@@ -51,14 +51,13 @@ if (!$link) {
         }
 
         if (empty($errors)) {
-            $user =
-                [
-                    'email' => $_POST['email'],
-                    'name' => $_POST['name'],
-                    'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
-                    'avatar_path' => '/img/' . $user_avatar['name'],
-                    'contacts' => $_POST['message']
-                ];
+            $user = [
+                'email' => $_POST['email'],
+                'name' => $_POST['name'],
+                'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
+                'avatar_path' => '/img/' . $user_avatar['name'],
+                'contacts' => $_POST['message']
+            ];
 
             $data = [$user['email'], $user['name'], $user['password'], $user['avatar_path'], $user['contacts']];
 

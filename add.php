@@ -48,14 +48,15 @@ if (!$link) {
         }
 
         if (empty($errors)) {
-                [
-                    'lot-name' => $lot_name,
-                    'category' => $category_id,
-                    'message' => $description,
-                    'lot-rate' => $initial_price,
-                    'lot-step' => $step_bet,
-                    'completion_date' => $completion_date
-                ] = $_POST;
+            [
+                'lot-name' => $lot_name,
+                'category' => $category_id,
+                'message' => $description,
+                'lot-rate' => $initial_price,
+                'lot-step' => $step_bet,
+                'completion_date' => $completion_date
+            ] = $_POST;
+
             $completion_date = date("Y-m-d H:i:s", strtotime($completion_date));
             $user_id = $_SESSION['user']['id'];
             $image = '/img/' . $_FILES['uploadfile']['name'];
