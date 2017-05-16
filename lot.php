@@ -4,30 +4,76 @@ session_start();
 
 require 'functions.php';
 
-include 'data.php';
+$link = getDbConnection();
 
 $lot_id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
-if (!array_key_exists($lot_id, $bulletin_board)) {
-    header('HTTP/1.1 404 Not Found');
-    exit();
+if (!$link) {
+    header('HTTP/1.1 500 Internal Server Error');
+    print('Ошибка подключения: ' . mysqli_connect_error());
+    die();
+
+} else {
+    $sql = "SELECT * FROM categories";
+    $categories = receivingData($link, $sql);
+
+    $sql = "SELECT lots.id,
+                   completion_date,
+                   lots.name AS lot_name,
+                   categories.name AS category,
+                   description,
+                   image,
+                   initial_price,
+                   step_bet AS step
+            FROM lots
+            JOIN categories ON lots.category_id = categories.id
+            WHERE lots.id = ?";
+
+    $bulletin_board = receivingData($link, $sql, [$lot_id]);
+
+    if (!isset($bulletin_board[0])) {
+        header('HTTP/1.1 404 Not Found');
+        exit();
+    }
+
+    $sql = "SELECT created_date, amount, bets.user_id, bets.lot_id, users.name AS name FROM bets"
+        ." JOIN users ON bets.user_id = users.id WHERE bets.lot_id = ?"
+        ." ORDER BY created_date DESC";
+    $bets = receivingData($link, $sql, [$lot_id]);
+
+
+    $lot = $bulletin_board[0];
+
+    if ($bets) {
+        $price =  $bets[0]['amount'];
+    } else {
+        $price = $lot['initial_price'];
+    }
+
+    if (!empty($_SESSION['user'])) {
+        $user_id = $_SESSION['user']['id'];
+
+        $sql = "SELECT amount AS cost, lot_id, created_date AS time FROM bets WHERE bets.user_id = ?";
+        $my_bets = receivingData($link, $sql, [$user_id]);
+
+        if (!empty($_POST['cost']) && filter_var($_POST['cost'], FILTER_VALIDATE_INT)) {
+            $bet = [
+                'cost' => $_POST['cost'],
+                'user_id' => $user_id,
+                'lot_id' => $lot_id,
+            ];
+
+            $sql = "INSERT INTO bets (`created_date`, `amount`, `user_id`, `lot_id`) VALUE (NOW(), ?, ?, ?)";
+            insertData($link, $sql, $bet);
+
+            header("Location: /mylots.php");
+            exit();
+        }
+    } else {
+        $my_bets = [];
+    }
+
 }
-
-$my_bets = getBetsList();
-
-if (!empty($_POST['cost']) && filter_var($_POST['cost'], FILTER_VALIDATE_INT)) {
-    $my_bets[] = [
-        'cost' => $_POST['cost'],
-        'lot_id' => $lot_id,
-        'time' => time(),
-    ];
-
-    $my_bets = json_encode($my_bets);
-    setcookie("my_bets", $my_bets, strtotime("+30 days"));
-    header("Location: /mylots.php");
-    exit();
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -42,13 +88,18 @@ if (!empty($_POST['cost']) && filter_var($_POST['cost'], FILTER_VALIDATE_INT)) {
 
 <?= includeTemplate('header.php'); ?>
 
-<?= includeTemplate('lot_content.php', [
-    'bets' => $bets,
-    'lot' => $bulletin_board[$lot_id],
-    'is_lot_has_bet' => isLotHasBet($lot_id, $my_bets)
-]); ?>
+<?= includeTemplate(
+    'lot_content.php',
+    [
+        'categories' => $categories,
+        'bets' => $bets,
+        'lot' => $lot,
+        'price' => $price,
+        'is_lot_has_bet' => isLotHasBet($lot_id, $my_bets)
+    ]
+); ?>
 
-<?= includeTemplate('footer.php'); ?>
+<?= includeTemplate('footer.php', ['categories' => $categories]); ?>
 
 </body>
 </html>

@@ -21,17 +21,21 @@ function includeTemplate($template, $array_data = [])
     return $html_template;
 }
 
-function lot_time_remaining()
+function lot_time_remaining($tomorrow)
 {
     date_default_timezone_set('Europe/Moscow');
-
-    $tomorrow = strtotime('tomorrow midnight');
 
     $now = time();
 
     $remaining_time_seconds = $tomorrow - $now;
 
     $remaining_time_hours = floor($remaining_time_seconds / 3600);
+
+    $remaining_time_day = floor($remaining_time_hours / 24);
+
+    if ($remaining_time_hours >= 24) {
+        $remaining_time_hours = $remaining_time_hours % 24;
+    }
 
     if ($remaining_time_hours < 10) {
         $remaining_time_hours = "0" . $remaining_time_hours;
@@ -43,7 +47,7 @@ function lot_time_remaining()
         $remaining_time_minutes = "0" . $remaining_time_minutes;
     }
 
-    $lot_time_remaining = $remaining_time_hours . ":" . $remaining_time_minutes;
+    $lot_time_remaining = $remaining_time_day .".". $remaining_time_hours . ":" . $remaining_time_minutes;
 
     return $lot_time_remaining;
 }
@@ -82,18 +86,15 @@ function checkEmptyPost($post)
     return $errors;
 }
 
-function searchUserByEmail($email, $users)
+function searchUserByEmail($link, $email)
 {
     $result = null;
 
-    foreach ($users as $user) {
-        if ($user['email'] == $email) {
-            $result = $user;
-
-            break;
-        }
+    $sql = 'SELECT `id`, `email`, `name`, `password`, `avatar_path`, `contacts` FROM `users` WHERE `email` = ? LIMIT 1';
+    $data = receivingData($link, $sql, [$email]);
+    if (isset($data[0])) {
+        $result = $data[0];
     }
-
     return $result;
 }
 

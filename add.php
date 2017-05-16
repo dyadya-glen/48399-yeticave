@@ -4,49 +4,85 @@ session_start();
 
 require 'functions.php';
 
-include 'data.php';
+$link = getDbConnection();
 
 if (empty($_SESSION['user'])) {
     header('HTTP/1.1 403 Forbidden');
     exit();
 }
 
-$errors = [];
-$photoLot = [];
+if (!$link) {
+    header('HTTP/1.1 500 Internal Server Error');
+    print('Ошибка подключения: ' . mysqli_connect_error());
+    die();
 
-if (!empty($_POST)) {
-    foreach ($_POST as $key => $value) {
-        $_POST[$key] = strip_tags($value);
+} else {
+    $sql = "SELECT * FROM categories";
+    $categories = receivingData($link, $sql);
 
-        if (empty($value)) {
-            $errors[$key] = 'Заполните это поле';
-            continue;
+    $errors = [];
+    $photoLot = [];
+
+    if (!empty($_POST)) {
+        foreach ($_POST as $key => $value) {
+            $_POST[$key] = strip_tags($value);
+
+            if (empty($value)) {
+                $errors[$key] = 'Заполните это поле';
+                continue;
+            }
+
+            if (in_array($key, ['lot-rate', 'lot-step']) && !filter_var($value, FILTER_VALIDATE_INT)) {
+                $errors[$key] = 'Введите число';
+            }
         }
 
-        if (in_array($key, ['lot-rate', 'lot-step']) && !filter_var($value, FILTER_VALIDATE_INT)) {
-            $errors[$key] = 'Введите число';
+        if (isset($_FILES['uploadfile'])) {
+            $photoLot = $_FILES['uploadfile'];
+
+            if ($photoLot['type'] == 'image/jpeg') {
+                move_uploaded_file($photoLot['tmp_name'], 'img/' . $photoLot['name']);
+            } else {
+                $errors['uploadfile'] = 'Неверный формат!';
+            }
         }
-    }
 
-    if (isset($_FILES['uploadfile'])) {
-        $photoLot = $_FILES['uploadfile'];
+        if (empty($errors)) {
+            [
+                'lot-name' => $lot_name,
+                'category' => $category_id,
+                'message' => $description,
+                'lot-rate' => $initial_price,
+                'lot-step' => $step_bet,
+                'completion_date' => $completion_date
+            ] = $_POST;
 
-        if ($photoLot['type'] == 'image/jpeg') {
-            move_uploaded_file($photoLot['tmp_name'], 'img/' . $photoLot['name']);
-        } else {
-            $errors['uploadfile'] = 'Неверный формат!';
+            $completion_date = date("Y-m-d H:i:s", strtotime($completion_date));
+            $user_id = $_SESSION['user']['id'];
+            $image = '/img/' . $_FILES['uploadfile']['name'];
+
+            $data = [
+                $completion_date,
+                $lot_name,
+                $description,
+                $image,
+                $initial_price,
+                $step_bet,
+                $user_id,
+                $category_id
+            ];
+
+            $sql = "INSERT INTO lots (created_date, completion_date, name, "
+                ."description, image, initial_price, step_bet, user_id, category_id)"
+                ."VALUE (NOW(), ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            $lot_id = insertData($link, $sql, $data);
+
+            if ($lot_id > 0) {
+                header("Location: /lot.php?id=" . $lot_id);
+                exit();
+            }
         }
-    }
-
-    if (empty($errors)) {
-        $lot = [
-            "name" => $_POST["lot-name"],
-            "category" => $_POST["category"],
-            "price" => $_POST["lot-rate"],
-            "url_image" => 'img/' . $photoLot['name'],
-            "description" => $_POST['message'],
-        ];
-
     }
 }
 
@@ -64,17 +100,9 @@ if (!empty($_POST)) {
 
 <?= includeTemplate('header.php'); ?>
 
-<?php if (empty($_POST) || !empty($errors)) : ?>
+<?= includeTemplate('add_lot.php', ['errors' => $errors, 'photoLot' => $photoLot, 'categories' => $categories]); ?>
 
-    <?= includeTemplate('add_lot.php', ['errors' => $errors, 'photoLot' => $photoLot, 'categories' => $categories]); ?>
-
-<?php else : ?>
-
-    <?= includeTemplate('lot_content.php', ['bets' => $bets, 'lot' => $lot]); ?>
-
-<?php endif; ?>
-
-<?= includeTemplate('footer.php'); ?>
+<?= includeTemplate('footer.php', ['categories' => $categories]); ?>
 
 </body>
 </html>

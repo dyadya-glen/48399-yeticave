@@ -4,16 +4,25 @@ session_start();
 
 require 'functions.php';
 
-include 'userdata.php';
+$link = getDbConnection();
+
+if (!$link) {
+    header('HTTP/1.1 500 Internal Server Error');
+    print('Ошибка подключения: ' . mysqli_connect_error());
+    die();
+
+} else {
+    $sql = "SELECT * FROM categories";
+    $categories = receivingData($link, $sql);
+}
 
 $errors = [];
 
 if (!empty($_POST)) {
     $errors = checkEmptyPost($_POST);
 
-
     if (empty($errors)) {
-        $user = searchUserByEmail($_POST['email'], $users);
+        $user = searchUserByEmail($link, $_POST['email']);
 
         if ($user) {
             if (password_verify($_POST['password'], $user['password'])) {
@@ -44,9 +53,9 @@ if (!empty($_POST)) {
 
 <?= includeTemplate('header.php'); ?>
 
-<?= includeTemplate('login.php', ['errors' => $errors]); ?>
+<?= includeTemplate('login.php', ['categories' => $categories, 'errors' => $errors]); ?>
 
-<?= includeTemplate('footer.php'); ?>
+<?= includeTemplate('footer.php', ['categories' => $categories]); ?>
 
 </body>
 </html>

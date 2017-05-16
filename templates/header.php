@@ -13,7 +13,7 @@
             <nav class="user-menu">
                 <ul class="user-menu__list">
                     <li class="user-menu__item">
-                        <a href="/sign-up.html">Регистрация</a>
+                        <a href="/sign_up.php">Регистрация</a>
                     </li>
                     <li class="user-menu__item">
                         <a href="/login.php">Вход</a>
@@ -23,7 +23,7 @@
         <?php else : ?>
             <nav class="user-menu">
                 <div class="user-menu__image">
-                    <img src="/img/<?= $_SESSION['user']['avatar'] ?>" width="40" height="40" alt="Пользователь">
+                    <a href="/mylots.php"><img src="<?= $_SESSION['user']['avatar_path'] ?>" width="40" height="40" alt="Пользователь"></a>
                 </div>
                 <div class="user-menu__logged">
                     <p><?= $_SESSION['user']['name'] ?></p>
