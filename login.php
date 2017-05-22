@@ -1,40 +1,23 @@
 <?php
 
-session_start();
+require_once 'bootstrap.php';
 
-require 'functions.php';
+$form = new LogInForm();
 
-$link = getDbConnection();
-
-if (!$link) {
-    header('HTTP/1.1 500 Internal Server Error');
-    print('Ошибка подключения: ' . mysqli_connect_error());
-    die();
-
-} else {
-    $sql = "SELECT * FROM categories";
-    $categories = receivingData($link, $sql);
-}
-
-$errors = [];
-
-if (!empty($_POST)) {
-    $errors = checkEmptyPost($_POST);
-
-    if (empty($errors)) {
-        $user = searchUserByEmail($link, $_POST['email']);
+if ($form->isSubmitted()) {
+    $form->validate();
+    if ($form->isValid()) {
+        $user = searchUserByEmail($data_base, $form->getFieldData('email'));
 
         if ($user) {
-            if (password_verify($_POST['password'], $user['password'])) {
-                $_SESSION['user'] = $user;
-
+            if ($auth_user->authenticatedUser($user, $form->getFieldData('password'))) {
                 header("Location: /");
                 exit();
             } else {
-                $errors['password'] = "Не верный пароль!";
+                $form->setError('password', 'Не верный пароль!');
             }
         } else {
-            $errors['email'] = "Пользователь не найден!";
+            $form->setError('email', "Пользователь не найден!");
         }
     }
 }
@@ -51,9 +34,15 @@ if (!empty($_POST)) {
 </head>
 <body>
 
-<?= includeTemplate('header.php'); ?>
+<?= includeTemplate(
+    'header.php',
+    [
+        'is_authorized' => $auth_user->isAuthorized(),
+        'user' => $auth_user->getDataUser()
+    ]
+); ?>
 
-<?= includeTemplate('login.php', ['categories' => $categories, 'errors' => $errors]); ?>
+<?= includeTemplate('login.php', ['categories' => $categories, 'form' => $form]); ?>
 
 <?= includeTemplate('footer.php', ['categories' => $categories]); ?>
 

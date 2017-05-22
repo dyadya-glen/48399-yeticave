@@ -78,6 +78,10 @@ h2 {
   clip-path: inset(100%);
 }
 
+.visually-hidden__file {
+  width: 300px;
+}
+
 .container {
   width: 1110px;
   margin: 0 auto;

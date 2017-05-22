@@ -1,25 +1,13 @@
 <?php
 
-session_start();
+require_once 'bootstrap.php';
 
-require 'functions.php';
+$sql = "SELECT lots.id, completion_date, lots.name AS lot_name, "
+    . "categories.name AS category, description, image, initial_price FROM lots "
+    . "JOIN categories ON lots.category_id = categories.id "
+    . "ORDER BY created_date DESC LIMIT 6";
+$bulletin_board = $data_base->receivingData($sql);
 
-$link = getDbConnection();
-
-if (!$link) {
-    header('HTTP/1.1 500 Internal Server Error');
-    print('Ошибка подключения: ' . mysqli_connect_error());
-    die();
-
-} else {
-    $sql = "SELECT * FROM categories";
-    $categories = receivingData($link, $sql);
-
-    $sql = "SELECT lots.id, completion_date, lots.name AS lot_name, categories.name AS category, description, image, initial_price FROM lots "
-        . "JOIN categories ON lots.category_id = categories.id "
-        . "ORDER BY created_date DESC LIMIT 6";
-    $bulletin_board = receivingData($link, $sql);
-}
 
 ?>
 
@@ -33,7 +21,13 @@ if (!$link) {
 </head>
 <body>
 
-<?= includeTemplate('header.php'); ?>
+<?= includeTemplate(
+    'header.php',
+    [
+        'is_authorized' => $auth_user->isAuthorized(),
+        'user' => $auth_user->getDataUser()
+    ]
+); ?>
 
 <?= includeTemplate('main.php', ['categories' => $categories, 'bulletin_board' => $bulletin_board]); ?>
 

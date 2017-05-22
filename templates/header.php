@@ -9,7 +9,7 @@
             <input class="main-header__search-btn" type="submit" name="find" value="Найти">
         </form>
         <a class="main-header__add-lot button" href="/add.php">Добавить лот</a>
-        <?php if (!isset($_SESSION['user'])) : ?>
+        <?php if (!$is_authorized) : ?>
             <nav class="user-menu">
                 <ul class="user-menu__list">
                     <li class="user-menu__item">
@@ -23,10 +23,10 @@
         <?php else : ?>
             <nav class="user-menu">
                 <div class="user-menu__image">
-                    <a href="/mylots.php"><img src="<?= $_SESSION['user']['avatar_path'] ?>" width="40" height="40" alt="Пользователь"></a>
+                    <a href="/mylots.php"><img src="<?= $user['avatar_path'] ?>" width="40" height="40" alt="Пользователь"></a>
                 </div>
                 <div class="user-menu__logged">
-                    <p><?= $_SESSION['user']['name'] ?></p>
+                    <p><?= $user['name'] ?></p>
                     <a href="/logout.php">Выйти</a>
                 </div>
             </nav>

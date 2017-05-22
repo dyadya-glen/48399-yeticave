@@ -1,90 +1,77 @@
 <?php
 
-session_start();
+require_once 'bootstrap.php';
 
-require 'functions.php';
-
-$link = getDbConnection();
-
-if (empty($_SESSION['user'])) {
+if (empty($auth_user->isAuthorized())) {
     header('HTTP/1.1 403 Forbidden');
     exit();
 }
 
-if (!$link) {
-    header('HTTP/1.1 500 Internal Server Error');
-    print('Ошибка подключения: ' . mysqli_connect_error());
-    die();
+$errors = [];
+$photoLot = [];
 
-} else {
-    $sql = "SELECT * FROM categories";
-    $categories = receivingData($link, $sql);
+if (!empty($_POST)) {
+    foreach ($_POST as $key => $value) {
+        $_POST[$key] = strip_tags($value);
 
-    $errors = [];
-    $photoLot = [];
-
-    if (!empty($_POST)) {
-        foreach ($_POST as $key => $value) {
-            $_POST[$key] = strip_tags($value);
-
-            if (empty($value)) {
-                $errors[$key] = 'Заполните это поле';
-                continue;
-            }
-
-            if (in_array($key, ['lot-rate', 'lot-step']) && !filter_var($value, FILTER_VALIDATE_INT)) {
-                $errors[$key] = 'Введите число';
-            }
+        if (empty($value)) {
+            $errors[$key] = 'Заполните это поле';
+            continue;
         }
 
-        if (isset($_FILES['uploadfile'])) {
-            $photoLot = $_FILES['uploadfile'];
-
-            if ($photoLot['type'] == 'image/jpeg') {
-                move_uploaded_file($photoLot['tmp_name'], 'img/' . $photoLot['name']);
-            } else {
-                $errors['uploadfile'] = 'Неверный формат!';
-            }
+        if (in_array($key, ['lot-rate', 'lot-step']) && !filter_var($value, FILTER_VALIDATE_INT)) {
+            $errors[$key] = 'Введите число';
         }
+    }
 
-        if (empty($errors)) {
-            [
-                'lot-name' => $lot_name,
-                'category' => $category_id,
-                'message' => $description,
-                'lot-rate' => $initial_price,
-                'lot-step' => $step_bet,
-                'completion_date' => $completion_date
-            ] = $_POST;
+    if (isset($_FILES['uploadfile'])) {
+        $photoLot = $_FILES['uploadfile'];
 
-            $completion_date = date("Y-m-d H:i:s", strtotime($completion_date));
-            $user_id = $_SESSION['user']['id'];
-            $image = '/img/' . $_FILES['uploadfile']['name'];
+        if ($photoLot['type'] == 'image/jpeg') {
+            move_uploaded_file($photoLot['tmp_name'], 'img/' . $photoLot['name']);
+        } else {
+            $errors['uploadfile'] = 'Неверный формат!';
+        }
+    }
 
-            $data = [
-                $completion_date,
-                $lot_name,
-                $description,
-                $image,
-                $initial_price,
-                $step_bet,
-                $user_id,
-                $category_id
-            ];
+    if (empty($errors)) {
+        [
+            'lot-name' => $lot_name,
+            'category' => $category_id,
+            'message' => $description,
+            'lot-rate' => $initial_price,
+            'lot-step' => $step_bet,
+            'completion_date' => $completion_date
+        ] = $_POST;
 
-            $sql = "INSERT INTO lots (created_date, completion_date, name, "
-                ."description, image, initial_price, step_bet, user_id, category_id)"
-                ."VALUE (NOW(), ?, ?, ?, ?, ?, ?, ?, ?)";
+        $completion_date = date("Y-m-d H:i:s", strtotime($completion_date));
+        $user_id = $_SESSION['user']['id'];
+        $image = '/img/' . $_FILES['uploadfile']['name'];
 
-            $lot_id = insertData($link, $sql, $data);
+        $data = [
+            $completion_date,
+            $lot_name,
+            $description,
+            $image,
+            $initial_price,
+            $step_bet,
+            $user_id,
+            $category_id
+        ];
 
-            if ($lot_id > 0) {
-                header("Location: /lot.php?id=" . $lot_id);
-                exit();
-            }
+        $sql = "INSERT INTO lots (created_date, completion_date, name, "
+            ."description, image, initial_price, step_bet, user_id, category_id)"
+            ."VALUE (NOW(), ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        $lot_id = $data_base->insertData($sql, $data);
+
+        if ($lot_id > 0) {
+            header("Location: /lot.php?id=" . $lot_id);
+            exit();
         }
     }
 }
+
 
 ?>
 
@@ -98,7 +85,7 @@ if (!$link) {
 </head>
 <body>
 
-<?= includeTemplate('header.php'); ?>
+<?= includeTemplate('header.php',['is_authorized' => $auth_user->isAuthorized(), 'user' => $auth_user->getDataUser()]); ?>
 
 <?= includeTemplate('add_lot.php', ['errors' => $errors, 'photoLot' => $photoLot, 'categories' => $categories]); ?>
 
