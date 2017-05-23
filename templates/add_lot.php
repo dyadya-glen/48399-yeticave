@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div class="form__input-file">
-                <input class="visually-hidden" type="file" id="photo2" name="uploadfile">
+                <input class="visually-hidden visually-hidden__file" type="file" id="photo2" name="uploadfile">
                 <label for="photo2">
                     <span>+ Добавить</span>
                 </label>

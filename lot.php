@@ -1,79 +1,68 @@
 <?php
 
-session_start();
-
-require 'functions.php';
-
-$link = getDbConnection();
+require_once 'bootstrap.php';
 
 $lot_id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
-if (!$link) {
-    header('HTTP/1.1 500 Internal Server Error');
-    print('Ошибка подключения: ' . mysqli_connect_error());
-    die();
+$sql = "SELECT lots.id,
+               completion_date,
+               lots.name AS lot_name,
+               categories.name AS category,
+               description,
+               image,
+               initial_price,
+               step_bet AS step,
+               user_id
+        FROM lots
+        JOIN categories ON lots.category_id = categories.id
+        WHERE lots.id = ?";
 
+$bulletin_board = $data_base->receivingData($sql, [$lot_id]);
+
+if (!isset($bulletin_board[0])) {
+    header('HTTP/1.1 404 Not Found');
+    exit();
+}
+
+$sql = "SELECT created_date, amount, bets.user_id, bets.lot_id, users.name AS name FROM bets"
+    ." JOIN users ON bets.user_id = users.id WHERE bets.lot_id = ?"
+    ." ORDER BY created_date DESC";
+$bets = $data_base->receivingData($sql, [$lot_id]);
+
+
+$lot = $bulletin_board[0];
+
+if ($bets) {
+    $price =  $bets[0]['amount'];
 } else {
-    $sql = "SELECT * FROM categories";
-    $categories = receivingData($link, $sql);
+    $price = $lot['initial_price'];
+}
 
-    $sql = "SELECT lots.id,
-                   completion_date,
-                   lots.name AS lot_name,
-                   categories.name AS category,
-                   description,
-                   image,
-                   initial_price,
-                   step_bet AS step
-            FROM lots
-            JOIN categories ON lots.category_id = categories.id
-            WHERE lots.id = ?";
+$user_id = $auth_user->getDataUser()['id'];
 
-    $bulletin_board = receivingData($link, $sql, [$lot_id]);
+if ($auth_user->isAuthorized()) {
 
-    if (!isset($bulletin_board[0])) {
-        header('HTTP/1.1 404 Not Found');
+    $sql = "SELECT amount AS cost, lot_id, created_date AS time FROM bets WHERE bets.user_id = ?";
+    $my_bets = $data_base->receivingData($sql, [$user_id]);
+
+    if (!empty($_POST['cost']) && filter_var($_POST['cost'], FILTER_VALIDATE_INT)) {
+        $bet = [
+            'cost' => $_POST['cost'],
+            'user_id' => $user_id,
+            'lot_id' => $lot_id,
+        ];
+
+        $sql = "INSERT INTO bets (`created_date`, `amount`, `user_id`, `lot_id`) VALUE (NOW(), ?, ?, ?)";
+        $data_base->insertData($sql, $bet);
+
+        header("Location: /mylots.php");
         exit();
     }
-
-    $sql = "SELECT created_date, amount, bets.user_id, bets.lot_id, users.name AS name FROM bets"
-        ." JOIN users ON bets.user_id = users.id WHERE bets.lot_id = ?"
-        ." ORDER BY created_date DESC";
-    $bets = receivingData($link, $sql, [$lot_id]);
-
-
-    $lot = $bulletin_board[0];
-
-    if ($bets) {
-        $price =  $bets[0]['amount'];
-    } else {
-        $price = $lot['initial_price'];
-    }
-
-    if (!empty($_SESSION['user'])) {
-        $user_id = $_SESSION['user']['id'];
-
-        $sql = "SELECT amount AS cost, lot_id, created_date AS time FROM bets WHERE bets.user_id = ?";
-        $my_bets = receivingData($link, $sql, [$user_id]);
-
-        if (!empty($_POST['cost']) && filter_var($_POST['cost'], FILTER_VALIDATE_INT)) {
-            $bet = [
-                'cost' => $_POST['cost'],
-                'user_id' => $user_id,
-                'lot_id' => $lot_id,
-            ];
-
-            $sql = "INSERT INTO bets (`created_date`, `amount`, `user_id`, `lot_id`) VALUE (NOW(), ?, ?, ?)";
-            insertData($link, $sql, $bet);
-
-            header("Location: /mylots.php");
-            exit();
-        }
-    } else {
-        $my_bets = [];
-    }
-
+} else {
+    $my_bets = [];
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -86,7 +75,13 @@ if (!$link) {
 </head>
 <body>
 
-<?= includeTemplate('header.php'); ?>
+<?= includeTemplate(
+    'header.php',
+    [
+        'is_authorized' => $auth_user->isAuthorized(),
+        'user' => $auth_user->getDataUser()
+    ]
+); ?>
 
 <?= includeTemplate(
     'lot_content.php',
@@ -95,7 +90,9 @@ if (!$link) {
         'bets' => $bets,
         'lot' => $lot,
         'price' => $price,
-        'is_lot_has_bet' => isLotHasBet($lot_id, $my_bets)
+        'is_lot_has_bet' => isLotHasBet($lot_id, $my_bets),
+        'is_authorized' => $auth_user->isAuthorized(),
+        'user_id' =>$user_id
     ]
 ); ?>
 

@@ -1,5 +1,6 @@
 <?php
-session_start();
-unset($_SESSION['user']);
 
+require_once 'bootstrap.php';
+
+$auth_user->logout();
 header("Location: /");

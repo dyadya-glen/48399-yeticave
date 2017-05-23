@@ -1,40 +1,25 @@
 <?php
 
-session_start();
+require_once 'bootstrap.php';
 
-require 'functions.php';
-
-if (empty($_SESSION['user'])) {
-    header('HTTP/1.1 500 Internal Server Error');
-    print('Ошибка подключения: ' . mysqli_connect_error());
-    die();
-
+if (!$auth_user->isAuthorized()) {
+    header('HTTP/1.1 403 Forbidden');
+    exit();
 }
 
-$link = getDbConnection();
+$sql = "SELECT bets.created_date,
+               amount,
+               lot_id,
+               lots.image AS lot_image,
+               lots.name AS lot_name,
+               lots.completion_date AS lot_completion_date,
+               categories.name AS category
+        FROM bets
+        JOIN lots ON lots.id = bets.lot_id
+        JOIN categories ON categories.id = lots.category_id
+        WHERE bets.user_id = ?";
 
-$my_bets = getBetsList();
-
-if (!$link) {
-    print('Ошибка подключения: ' . mysqli_connect_error());
-} else {
-    $sql = "SELECT * FROM categories";
-    $categories = receivingData($link, $sql);
-
-    $sql = "SELECT bets.created_date,
-                   amount,
-                   lot_id,
-                   lots.image AS lot_image,
-                   lots.name AS lot_name,
-                   lots.completion_date AS lot_completion_date,
-                   categories.name AS category
-            FROM bets
-            JOIN lots ON lots.id = bets.lot_id
-            JOIN categories ON categories.id = lots.category_id
-            WHERE bets.user_id = ?";
-
-    $my_bets = receivingData($link, $sql, [$_SESSION['user']['id']]);
-}
+$my_bets = $data_base->receivingData($sql, [$auth_user->getDataUser()['id']]);
 
 ?>
 
@@ -48,7 +33,13 @@ if (!$link) {
 </head>
 <body>
 
-<?= includeTemplate('header.php'); ?>
+<?= includeTemplate(
+    'header.php',
+    [
+        'is_authorized' => $auth_user->isAuthorized(),
+        'user' => $auth_user->getDataUser()
+    ]
+); ?>
 
 <?= includeTemplate('mylots.php', ['my_bets' => $my_bets, 'categories' => $categories]); ?>
 

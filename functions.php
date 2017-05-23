@@ -2,6 +2,8 @@
 
 include 'mysql_helper.php';
 
+//require_once 'bootstrap.php';
+
 function includeTemplate($template, $array_data = [])
 {
     $template = 'templates/' . $template;
@@ -86,12 +88,12 @@ function checkEmptyPost($post)
     return $errors;
 }
 
-function searchUserByEmail($link, $email)
+function searchUserByEmail($data_base, $email)
 {
     $result = null;
 
     $sql = 'SELECT `id`, `email`, `name`, `password`, `avatar_path`, `contacts` FROM `users` WHERE `email` = ? LIMIT 1';
-    $data = receivingData($link, $sql, [$email]);
+    $data = $data_base->receivingData($sql, [$email]);
     if (isset($data[0])) {
         $result = $data[0];
     }

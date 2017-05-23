@@ -11,7 +11,7 @@
                 <p class="lot-item__description"><?= strip_tags($lot['description']) ?></p>
             </div>
             <div class="lot-item__right">
-                <?php if (isset($_SESSION['user'])) : ?>
+                <?php if ($is_authorized) : ?>
                     <div class="lot-item__state">
                         <div class="lot-item__timer timer">
                             <?= lot_time_remaining(strtotime($lot['completion_date'])); ?>
@@ -25,7 +25,7 @@
                                 Мин. ставка <span><?= $price + $lot['step'] ?></span>
                             </div>
                         </div>
-                        <?php if (empty($is_lot_has_bet)) : ?>
+                        <?php if (empty($is_lot_has_bet) && $user_id != $lot['user_id']) : ?>
                             <form class="lot-item__form" action="<?= $_SERVER['REQUEST_URI'] ?>" method="post">
                                 <p class="lot-item__form-item">
                                     <label for="cost">Ваша ставка</label>
