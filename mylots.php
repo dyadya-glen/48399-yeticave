@@ -1,19 +1,11 @@
 <?php
 
 require_once 'bootstrap.php';
-//
-//if (empty($_SESSION['user'])) {
-//    header('HTTP/1.1 500 Internal Server Error');
-//    print('Ошибка подключения: ' . mysqli_connect_error());
-//    die();
-//
-//}
 
-//$my_bets = getBetsList();
-
-
-$sql = "SELECT * FROM categories";
-$categories = $data_base->receivingData($sql);
+if (!$auth_user->isAuthorized()) {
+    header('HTTP/1.1 403 Forbidden');
+    exit();
+}
 
 $sql = "SELECT bets.created_date,
                amount,

@@ -10,7 +10,7 @@ if ($form->isSubmitted()) {
         $user = searchUserByEmail($data_base, $form->getFieldData('email'));
 
         if ($user) {
-            if ($auth_user->authenticatedUser($user, $form->getFieldData('password'))) {
+            if ($auth_user->authenticateUse($user, $form->getFieldData('password'))) {
                 header("Location: /");
                 exit();
             } else {

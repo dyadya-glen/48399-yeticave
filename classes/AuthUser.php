@@ -20,7 +20,7 @@ class AuthUser
      * @param $password
      * @return bool
      */
-    public function authenticatedUser($user, $password)
+    public function authenticateUse($user, $password)
     {
         if (!password_verify($password, $user['password'])) {
             return false;
